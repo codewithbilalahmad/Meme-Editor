@@ -9,9 +9,9 @@ interface MemeExporter{
     @OptIn(ExperimentalUuidApi::class)
     suspend fun exportMeme(
         backgroundImageBytes : ByteArray,
-        memeText : List<MemeText>,
+        memeTexts : List<MemeText>,
         templateSize : IntSize,
         saveToStorageStrategy: SaveToStorageStrategy,
         fileName : String = "meme_${Uuid.random().toString()}.jpg"
-    )
+    ) : Result<String>
 }

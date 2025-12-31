@@ -5,14 +5,24 @@ package com.muhammad.memes.meme_editor.presentation
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.muhammad.memes.core.presentation.MemeTemplate
+import com.muhammad.memes.meme_editor.domain.MemeExporter
+import com.muhammad.memes.meme_editor.domain.SaveToStorageStrategy
+import com.muhammad.memes.meme_editor.domain.ShareSheet
+import com.muhammad.memes.meme_editor.presentation.util.getImageBytesFromResources
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-class MemeEditorViewModel : ViewModel() {
+class MemeEditorViewModel(
+    private val saveToStorageStrategy: SaveToStorageStrategy,
+    private val memeExporter: MemeExporter,
+    private val shareSheet: ShareSheet,
+) : ViewModel() {
     private val _state = MutableStateFlow(MemeEditorState())
     val state = _state.asStateFlow()
     fun onAction(action: MemeEditorAction) {
@@ -110,6 +120,18 @@ class MemeEditorViewModel : ViewModel() {
     }
 
     private fun onSaveMemeClick(memeTemplate: MemeTemplate) {
+        viewModelScope.launch {
+            memeExporter.exportMeme(
+                backgroundImageBytes = getImageBytesFromResources(memeTemplate.drawable),
+                memeTexts = state.value.memeTexts,
+                saveToStorageStrategy = saveToStorageStrategy,
+                templateSize = state.value.templateSize
+            ).onSuccess { filePath ->
+                shareSheet.shareFile(filePath)
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
     }
 
     private fun onSelectMemeText(id: String) {

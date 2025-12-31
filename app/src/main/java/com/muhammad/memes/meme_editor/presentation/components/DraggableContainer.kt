@@ -52,7 +52,7 @@ fun DraggableContainer(
                     val visualWidth = abs(scaledWidth * cos) + abs(scaleHeight * sin)
                     val visualHeight = abs(scaledWidth * sin) + abs(scaleHeight * cos)
                     val scaleOffsetX = (scaledWidth - childWidth) / 2
-                    val scaleOffsetY = (scaleHeight - scaleHeight) / 2
+                    val scaleOffsetY = (scaleHeight - childHeight) / 2
                     val rotatedOffsetX = (visualWidth - scaledWidth) / 2
                     val rotatedOffsetY = (visualHeight - scaleHeight) / 2
 

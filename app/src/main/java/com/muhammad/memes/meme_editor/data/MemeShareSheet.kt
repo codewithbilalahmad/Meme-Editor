@@ -1,0 +1,26 @@
+package com.muhammad.memes.meme_editor.data
+
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.FileProvider
+import com.muhammad.memes.meme_editor.domain.ShareSheet
+import java.io.File
+
+class MemeShareSheet(
+    private val context: Context,
+) : ShareSheet {
+    override suspend fun shareFile(filePath: String) {
+        val file = File(filePath)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/jpeg"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        val chooser = Intent.createChooser(intent, "Share Meme").apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context.startActivity(chooser)
+    }
+}
